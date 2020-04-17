@@ -13,7 +13,7 @@ namespace BusServiceApp.SenderApp
         static IQueueClient queueClient;
         public static async Task Main(string[] args)
         {
-            const int numberOfMessages = 10;
+            const int numberOfMessages = 2;
             queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
 
             // Send messages.
@@ -48,4 +48,3 @@ namespace BusServiceApp.SenderApp
         }
     }
 }
-
