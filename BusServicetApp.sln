@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SenderApp", "SenderApp\SenderApp.csproj", "{67BE5CAA-0686-40B6-9E4A-5E4900658FB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusServiceApp.SenderApp", "SenderApp\BusServiceApp.SenderApp.csproj", "{67BE5CAA-0686-40B6-9E4A-5E4900658FB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusServiceApp.EF", "BusServiceApp.EF\BusServiceApp.EF.csproj", "{3D4810C5-EDF1-4E25-BBD2-BCE0F575A798}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusServiceApp.EF", "BusServiceApp.EF\BusServiceApp.EF.csproj", "{3D4810C5-EDF1-4E25-BBD2-BCE0F575A798}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

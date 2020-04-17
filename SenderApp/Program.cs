@@ -1,26 +1,51 @@
 ﻿using System;
-using System.Linq;
-using BusServiceApp.EF.Models;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
 
-namespace SenderApp
+namespace BusServiceApp.SenderApp
 {
     class Program
     {
-        static void Main(string[] args)
+        const string ServiceBusConnectionString = "Endpoint=sb://userbusservice.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=DoNJnlRCEO3tLKQUtMkeyf9a5DQRpZP0Z5b4jf+rF3Q=";
+        const string QueueName = "userqueue";
+        static IQueueClient queueClient;
+        public static async Task Main(string[] args)
         {
-            ApplicationContext db = new ApplicationContext();
+            const int numberOfMessages = 10;
+            queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
 
-            User user1 = new User{ FirstName = "Artem", LastName = "Vatsyk", Age = "23"};
-            db.Users.Add(user1);
-            db.SaveChanges();
-            Console.WriteLine("I don't know, better to check!");
+            // Send messages.
+            await SendMessagesAsync(numberOfMessages);
 
-            var users = db.Users.ToList();
-            foreach (User i in users)
+            Console.ReadKey();
+
+            await queueClient.CloseAsync();
+        }
+
+        static async Task SendMessagesAsync(int numberOfMessagesToSend)
+        {
+            try
             {
-                Console.WriteLine(i.FirstName);
+                for (var i = 0; i < numberOfMessagesToSend; i++)
+                {
+                    // Create a new message to send to the queue
+                    string messageBody = $"Message {i}";
+                    var message = new Message(Encoding.UTF8.GetBytes(messageBody));
+
+                    // Write the body of the message to the console
+                    Console.WriteLine($"Sending message: {messageBody}");
+
+                    // Send the message to the queue
+                    await queueClient.SendAsync(message);
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
             }
         }
     }
 }
+
