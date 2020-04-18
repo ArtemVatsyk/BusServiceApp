@@ -1,44 +1,44 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
-using System.Threading;
+using System.Text.Json;
 using System.Threading.Tasks;
+using BusServiceApp.EF.Models;
 using Microsoft.Azure.ServiceBus;
 
 namespace BusServiceApp.SenderApp
 {
     class Program
     {
+        private static ApplicationContext db = new ApplicationContext();
+
         const string ServiceBusConnectionString = "Endpoint=sb://userbusservice.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=DoNJnlRCEO3tLKQUtMkeyf9a5DQRpZP0Z5b4jf+rF3Q=";
         const string QueueName = "userqueue";
         static IQueueClient queueClient;
         public static async Task Main(string[] args)
         {
-            const int numberOfMessages = 2;
             queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
 
             // Send messages.
-            await SendMessagesAsync(numberOfMessages);
+            await SendMessagesAsync();
 
             Console.ReadKey();
 
             await queueClient.CloseAsync();
         }
 
-        static async Task SendMessagesAsync(int numberOfMessagesToSend)
+        static async Task SendMessagesAsync()
         {
+            var users = db.Users.ToList();
             try
             {
-                for (var i = 0; i < numberOfMessagesToSend; i++)
+                foreach (var u in users)
                 {
-                    // Create a new message to send to the queue
-                    string messageBody = $"Message {i}";
-                    var message = new Message(Encoding.UTF8.GetBytes(messageBody));
-
-                    // Write the body of the message to the console
-                    Console.WriteLine($"Sending message: {messageBody}");
-
-                    // Send the message to the queue
+                    var json = JsonSerializer.Serialize(u);
+                    var message = new Message(Encoding.UTF8.GetBytes(json));
                     await queueClient.SendAsync(message);
+                    Console.WriteLine(json);
+                    Console.WriteLine("Done!");
                 }
             }
             catch (Exception exception)
