@@ -6,10 +6,11 @@ namespace BusServiceApp.EF.Models
     {
 
         public DbSet<User> Users { get; set; }
+        public DbSet<UserReceiver>  UserReceivers { get; set; }
 
         public ApplicationContext()
         {
-            Database.EnsureCreated();
+           // Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
