@@ -9,4 +9,8 @@
     <PackageReference Include="WindowsAzure.ServiceBus" Version="3.4.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BusServiceApp.EF\BusServiceApp.EF.csproj" />
+  </ItemGroup>
+
 </Project>

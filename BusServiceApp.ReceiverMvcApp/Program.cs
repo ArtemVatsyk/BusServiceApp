@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using BusServiceApp.EF.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -17,6 +21,7 @@ namespace BusServiceApp.ReceiverMvcApp
         const string ServiceBusConnectionString = "Endpoint=sb://userbusservice.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=DoNJnlRCEO3tLKQUtMkeyf9a5DQRpZP0Z5b4jf+rF3Q=";
         const string QueueName = "userqueue";
         static IQueueClient queueClient;
+        private static readonly ApplicationContext Db = new ApplicationContext();
 
         public static void Main(string[] args)
         {
@@ -59,11 +64,12 @@ namespace BusServiceApp.ReceiverMvcApp
 
         static async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
-            var textmessage = Encoding.UTF8.GetString(message.Body);
+            string textmessage = Encoding.UTF8.GetString(message.Body);
+            UserReceiver _userReceiver = JsonSerializer.Deserialize<UserReceiver>(textmessage);
+            Db.UserReceivers.Add(_userReceiver);
+            Db.SaveChanges();
 
-            //Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
             await queueClient.CompleteAsync(message.SystemProperties.LockToken);
-
         }
 
         static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
