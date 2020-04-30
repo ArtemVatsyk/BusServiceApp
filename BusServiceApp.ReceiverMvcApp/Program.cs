@@ -1,18 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using BusServiceApp.EF.Models;
+using BusServiceApp.ReceiverMvcApp.Models;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Azure.ServiceBus;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace BusServiceApp.ReceiverMvcApp
 {
@@ -21,11 +15,12 @@ namespace BusServiceApp.ReceiverMvcApp
         const string ServiceBusConnectionString = "Endpoint=sb://userbusservice.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=DoNJnlRCEO3tLKQUtMkeyf9a5DQRpZP0Z5b4jf+rF3Q=";
         const string QueueName = "userqueue";
         static IQueueClient queueClient;
-        private static readonly ApplicationContext Db = new ApplicationContext();
+        private  static readonly UserContext userContext = new UserContext();
 
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            (new Thread(() => { CreateHostBuilder(args).Build().Run(); })).Start();
+            
             MainAsync().GetAwaiter().GetResult();
         }
 
@@ -65,9 +60,9 @@ namespace BusServiceApp.ReceiverMvcApp
         static async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
             string textmessage = Encoding.UTF8.GetString(message.Body);
-            UserReceiver _userReceiver = JsonSerializer.Deserialize<UserReceiver>(textmessage);
-            Db.UserReceivers.Add(_userReceiver);
-            Db.SaveChanges();
+            User _user = JsonSerializer.Deserialize<User>(textmessage);
+            userContext.Add(_user);
+            userContext.SaveChanges();
 
             await queueClient.CompleteAsync(message.SystemProperties.LockToken);
         }

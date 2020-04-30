@@ -6,7 +6,6 @@ namespace BusServiceApp.EF.Models
     {
 
         public DbSet<User> Users { get; set; }
-        public DbSet<UserReceiver>  UserReceivers { get; set; }
 
         public ApplicationContext()
         {
